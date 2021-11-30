@@ -16,7 +16,9 @@ The technologies used in this project are:
 * Maven
 
 ## Installation
-
+```
+$ mvn package
+```
 
 ## Usage
 
