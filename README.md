@@ -15,8 +15,8 @@ The technologies used in this project are:
 * JUnit
 * Maven
 
-##Installation
+## Installation
 
 
-##Usage
+## Usage
 
