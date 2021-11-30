@@ -16,9 +16,15 @@ The technologies used in this project are:
 * Maven
 
 ## Installation
+Run the following command in the working directory (directory with pom.xml) of the project to compile, test and package the project
+
 ```
-$ mvn package
+$ mvn clean package
 ```
 
 ## Usage
+Run the following command to start the CLI Ticket Viewer
+```
+$ java -jar target/Zendesk-Ticket-Viewer-ZCC-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
 
