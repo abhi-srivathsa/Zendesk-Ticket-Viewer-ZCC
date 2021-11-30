@@ -8,18 +8,15 @@ import java.net.*;
 import java.util.Locale;
 import java.util.Scanner;
 
-public class Min {
+public class Main {
 
     public static void main(String[] args) {
+        String token = "C2wruqvtdnC4gBd2evT70RbNtC4aQ7F8qUdLwj1S";
         String menu = "menu";
         String quit = "quit";
         boolean isQuit = false;
 
-        Authenticator.setDefault (new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("asrivathsa@scu.edu/token","C2wruqvtdnC4gBd2evT70RbNtC4aQ7F8qUdLwj1S".toCharArray());
-            }
-        });
+
 
         System.out.println("\n\n\n********** MOBILE TICKET VIEWER **********");
         System.out.println("\n\nWelcome to the ticket viewer\n\n");
@@ -27,6 +24,8 @@ public class Min {
         while(true) {
 
             if(isQuit) break;
+
+            // Displays the menu for the Ticket Viewer
 
             System.out.println("Type 'menu' to view the menu or 'quit' to quit");
             String menuOption = scanner.nextLine();
@@ -40,13 +39,13 @@ public class Min {
                     String viewOption = scanner.nextLine();
                     switch (viewOption) {
                         case "1":
-                            retrieveAllData();
+                            printAllTickets(token);
                             break;
                         case "2":
                             System.out.println("enter ticket id : ");
                             int ticketNumber = scanner.nextInt();
                             scanner.nextLine();
-                            retrieveTicket(ticketNumber);
+                            printSpecificTicket(ticketNumber,token);
                             break;
                         case "quit":
                             isQuit = true;
@@ -73,24 +72,100 @@ public class Min {
 
     }
 
-    public static void retrieveTicket(int ticketNumber) {
+    //method to print all tickets
+    public static void printAllTickets(String token){
+        // An array of JSON objects are returned
+        // Each ticket is listed with minimal information
+        // Displays 25 tickets for each page
 
+        JSONArray arr = retrieveAllData(token);
+        if(arr == null) return;
+        int ticketCount = 0;
+        Boolean isNext = true;
+        for (int i = 0; i < arr.size(); i++) {
+            JSONObject new_obj = (JSONObject) arr.get(i);
+            System.out.println("Ticket id : " + new_obj.get("id"));
+            System.out.println("Subject: " + new_obj.get("subject"));
+            System.out.println("Submitter: " + new_obj.get("submitter_id"));
+            System.out.println("Last updated on " + new_obj.get("updated_at") + "\n");
+            ticketCount++;
+            if(ticketCount == 25){
+                Boolean option = true;
+                ticketCount = 0;
+                while(option) {
+                    System.out.println("Next page? 'yes' / 'no' :");
+                    Scanner tScanner = new Scanner(System.in);
+                    String nextPage = tScanner.nextLine();
+                    if (nextPage.toLowerCase().equals("no")){
+                        option =false;
+                        isNext = false;
+                        break;
+                    }
+                    else if (nextPage.toLowerCase().equals("yes")) {
+                        option = false;
+                        continue;
+                    }
+                    else System.out.println("Invalid option, try again");
+                }
+                if(!isNext) break;
+            }
+        }
+        
+    }
+
+    // Method to display detailed information for a specific ticket
+
+    public static void printSpecificTicket(int ticketNumber, String token){
+        // A JSON object is returned and the required values are displayed
+
+        JSONObject obj = retrieveTicket(ticketNumber,token);
+        if(obj == null) return;
+        System.out.println("\nTICKET DETAILS");
+        System.out.println("Ticket id : " + obj.get("id"));
+        System.out.println("Created on : " + obj.get("created_at"));
+        System.out.println("Subject : " + obj.get("raw_subject"));
+        System.out.println("Requester : " + obj.get("requester_id"));
+        System.out.println("Assigned to : " + obj.get("assignee_id"));
+        System.out.println("Last updated on : "  + obj.get("updated_at"));
+        System.out.println("Ticket Status : "  + obj.get("status"));
+        System.out.println("Full Description : ");
+        System.out.println(obj.get("description"));
+    }
+
+    // Method to fetch the information regarding a specific ticket from Zendesk using the API
+    public static JSONObject retrieveTicket(int ticketNumber, String token) {
+
+        // Providing authentication for the API request
+
+        Authenticator.setDefault (new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("asrivathsa@scu.edu/token",token.toCharArray());
+            }
+        });
+        JSONObject obj = null;
         try {
-            URL url = new URL("https://zccabhilash.zendesk.com/api/v2/tickets/"+ ticketNumber + ".json?");
 
+            // GET request to get a ticket from Zendesk
+
+            URL url = new URL("https://zccabhilash.zendesk.com/api/v2/tickets/"+ ticketNumber + ".json?");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
 
-            //Getting the response code
+            // Getting the response code
             int responseCode = conn.getResponseCode();
 
+            // Response code error handling
             if (responseCode == 404){
-                System.out.println("No such ticket exists! Please enter a valid ticket number");
+                System.err.println("No such ticket exists! Please enter a valid ticket number");
+            }else if(responseCode == 400){
+                System.err.println("The request was invalid! Please check the ticket number");
             }else if(responseCode == 500 ){
-                System.out.println("Internal Server Error. The API is not available right now!");
+                System.err.println("Internal Server Error. The API is not available right now!");
+                throw new RuntimeException("HttpResponseCode: " + responseCode);
             }else if(responseCode == 401){
-                System.out.println("Uh oh! you are not authorized to view this content");
+                System.err.println("Uh oh! you are not authorized to view this content");
+                throw new RuntimeException("HttpResponseCode: " + responseCode);
             }else if (responseCode != 200) {
                 System.err.println("\n\nOops! looks like we ran into some error. Please find the error as follows: \n");
                 throw new RuntimeException("HttpResponseCode: " + responseCode);
@@ -98,37 +173,41 @@ public class Min {
                 String inline = "";
                 Scanner scanner = new Scanner(url.openStream());
 
-                //Write all the JSON data into a string using a scanner
+                // Write all the JSON data into a string using a scanner
                 while (scanner.hasNext()) {
                     inline += scanner.nextLine();
                 }
 
-                //Close the scanner
+                // Close the scanner
                 scanner.close();
 
-                //Using the JSON simple library parse the string into a json object
+                // Using the JSON simple library parse the string into a json object
                 JSONParser parse = new JSONParser();
                 JSONObject data_obj = (JSONObject) parse.parse(inline);
-                JSONObject obj = (JSONObject) data_obj.get("ticket");
-                System.out.println("\nTICKET DETAILS");
-                System.out.println("Ticket id : " + obj.get("id"));
-                System.out.println("Created on : " + obj.get("created_at"));
-                System.out.println("Subject : " + obj.get("raw_subject"));
-                System.out.println("Requester : " + obj.get("requester_id"));
-                System.out.println("Assigned to : " + obj.get("assignee_id"));
-                System.out.println("Last updated on : "  + obj.get("updated_at"));
-                System.out.println("Ticket Status : "  + obj.get("status"));
-                System.out.println("Full Description : ");
-                System.out.println(obj.get("description"));
+                obj = (JSONObject) data_obj.get("ticket");
+                
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return obj;
     }
 
-    public static void retrieveAllData(){
+    // Method to retrieve all tickets from Zendesk using the API
+    public static JSONArray retrieveAllData(String token){
+        JSONArray arr = null;
+
+        // Providing authentication for the API request
+
+        Authenticator.setDefault (new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("asrivathsa@scu.edu/token",token.toCharArray());
+            }
+        });
+
         try {
+            // GET request to get all tickets from Zendesk
 
             URL url = new URL("https://zccabhilash.zendesk.com/api/v2/tickets.json?");
 
@@ -136,10 +215,20 @@ public class Min {
             conn.setRequestMethod("GET");
             conn.connect();
 
-            //Getting the response code
+            // Getting the response code
             int responseCode = conn.getResponseCode();
 
-            if (responseCode != 200) {
+            // Response code error handling
+
+            if (responseCode == 404){
+                System.err.println("No such tickets exist!");
+            }else if(responseCode == 500 ){
+                System.err.println("Internal Server Error. The API is not available right now!");
+                throw new RuntimeException("HttpResponseCode: " + responseCode);
+            }else if(responseCode == 401){
+                System.err.println("Uh oh! you are not authorized to view this content");
+                throw new RuntimeException("HttpResponseCode: " + responseCode);
+            }else if (responseCode != 200) {
                 System.err.println("\n\nOops! looks like we ran into some error. Please find the error as follows: \n");
                 throw new RuntimeException("HttpResponseCode: " + responseCode);
             } else {
@@ -147,39 +236,27 @@ public class Min {
                 String inline = "";
                 Scanner scanner = new Scanner(url.openStream());
 
-                //Write all the JSON data into a string using a scanner
+                // Write all the JSON data into a string using a scanner
                 while (scanner.hasNext()) {
                     inline += scanner.nextLine();
                 }
 
-                //Close the scanner
+                // Close the scanner
                 scanner.close();
 
-                //Using the JSON simple library parse the string into a json object
+                // Using the JSON simple library parse the string into a json object
                 JSONParser parse = new JSONParser();
                 JSONObject data_obj = (JSONObject) parse.parse(inline);
-                JSONArray arr = (JSONArray) data_obj.get("tickets");
-                int ticketCount = 0;
-                for (int i = 0; i < arr.size(); i++) {
-                    JSONObject new_obj = (JSONObject) arr.get(i);
-                    System.out.println("Ticket id : " + new_obj.get("id"));
-                    System.out.println("Subject: " + new_obj.get("subject"));
-                    System.out.println("Submitter: " + new_obj.get("submitter_id"));
-                    System.out.println("Last updated on " + new_obj.get("updated_at") + "\n");
-                    ticketCount++;
-                    if(ticketCount == 25){
-                        ticketCount = 0;
-                        System.out.println("Next page? 'yes' / 'no' :");
-                        Scanner tScanner = new Scanner(System.in);
-                        String nextPage = tScanner.nextLine();
-                        if(nextPage.equals("no")) break;
-                    }
-                }
+                arr = (JSONArray) data_obj.get("tickets");
+                
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-        }
+        e.printStackTrace();
     }
+        return arr;
+}
+
+
 
 }
