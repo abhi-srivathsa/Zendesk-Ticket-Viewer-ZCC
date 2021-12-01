@@ -15,10 +15,30 @@ The technologies used in this project are:
 * JUnit
 * Maven
 
+## Requirements
+* JDK 17.0.1
+* Apache Maven 3.8.4
+* git
+
 ## Installation
+Download the project as a zip and unzip it in your system or clone the project using git with the following command
 ```
-$ mvn package
+git clone https://github.com/abhi-srivathsa/Zendesk-Ticket-Viewer-ZCC.git
+```
+
+Change the current working directory
+```
+cd Zendesk-Ticket-Viewer-ZCC
+```
+
+Run the following command in the working directory (directory with pom.xml) of the project to compile, test and package the project
+```
+mvn clean package
 ```
 
 ## Usage
+Run the following command to start the CLI Ticket Viewer
+```
+java -jar target/Zendesk-Ticket-Viewer-ZCC-1.0-SNAPSHOT-jar-with-dependencies.jar
+```
 
