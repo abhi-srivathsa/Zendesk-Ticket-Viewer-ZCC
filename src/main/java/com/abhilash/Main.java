@@ -82,7 +82,8 @@ public class Main {
         if(arr == null) return;
         int ticketCount = 0;
         Boolean isNext = true;
-        for (int i = 0; i < arr.size(); i++) {
+        int i = 0;
+        for (i = 0; i < arr.size(); i++) {
             JSONObject new_obj = (JSONObject) arr.get(i);
             System.out.println("Ticket id : " + new_obj.get("id"));
             System.out.println("Subject: " + new_obj.get("subject"));
@@ -109,6 +110,9 @@ public class Main {
                 }
                 if(!isNext) break;
             }
+        }
+        if(i == arr.size()){
+            System.out.println("End of list! No more tickets to show.");
         }
         
     }
