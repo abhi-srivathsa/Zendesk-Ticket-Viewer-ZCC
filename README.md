@@ -18,6 +18,7 @@ The technologies used in this project are:
 ## Requirements
 * JDK 17.0.1
 * Apache Maven 3.8.4
+* git
 
 ## Installation
 Download the project as a zip and unzip it in your system or clone the project using git with the following command
