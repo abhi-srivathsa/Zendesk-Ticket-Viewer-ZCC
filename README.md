@@ -32,7 +32,7 @@ cd Zendesk-Ticket-Viewer-ZCC
 
 Run the following command in the working directory (directory with pom.xml) of the project to compile, test and package the project
 ```
-mvn clean ,,package''
+mvn clean package
 ```
 
 ## Usage
