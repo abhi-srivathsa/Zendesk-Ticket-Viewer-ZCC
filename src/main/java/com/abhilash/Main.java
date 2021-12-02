@@ -7,11 +7,17 @@ import org.json.simple.parser.JSONParser;
 import java.net.*;
 import java.util.Locale;
 import java.util.Scanner;
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 
 public class Main {
 
     public static void main(String[] args) {
-        String token = "C2wruqvtdnC4gBd2evT70RbNtC4aQ7F8qUdLwj1S";
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String user = dotenv.get("USERNAME");
+        String token = dotenv.get("TOKEN");
         String menu = "menu";
         String quit = "quit";
         boolean isQuit = false;
@@ -39,13 +45,13 @@ public class Main {
                     String viewOption = scanner.nextLine();
                     switch (viewOption) {
                         case "1":
-                            printAllTickets(token);
+                            printAllTickets(subDomain,user,token);
                             break;
                         case "2":
                             System.out.println("enter ticket id : ");
                             int ticketNumber = scanner.nextInt();
                             scanner.nextLine();
-                            printSpecificTicket(ticketNumber,token);
+                            printSpecificTicket(ticketNumber,subDomain,user,token);
                             break;
                         case "quit":
                             isQuit = true;
@@ -73,12 +79,12 @@ public class Main {
     }
 
     //method to print all tickets
-    public static void printAllTickets(String token){
+    public static void printAllTickets(String subdomain, String user, String token){
         // An array of JSON objects are returned
         // Each ticket is listed with minimal information
         // Displays 25 tickets for each page
 
-        JSONArray arr = retrieveAllData(token);
+        JSONArray arr = retrieveAllData(subdomain, user, token);
         if(arr == null) return;
         int ticketCount = 0;
         Boolean isNext = true;
@@ -119,10 +125,10 @@ public class Main {
 
     // Method to display detailed information for a specific ticket
 
-    public static void printSpecificTicket(int ticketNumber, String token){
+    public static void printSpecificTicket(int ticketNumber, String subdomain, String user, String token){
         // A JSON object is returned and the required values are displayed
 
-        JSONObject obj = retrieveTicket(ticketNumber,token);
+        JSONObject obj = retrieveTicket(ticketNumber,subdomain, user, token);
         if(obj == null) return;
         System.out.println("\nTICKET DETAILS");
         System.out.println("Ticket id : " + obj.get("id"));
@@ -137,13 +143,17 @@ public class Main {
     }
 
     // Method to fetch the information regarding a specific ticket from Zendesk using the API
-    public static JSONObject retrieveTicket(int ticketNumber, String token) {
+    public static JSONObject retrieveTicket(int ticketNumber, String subdomain, String user, String token) {
 
+        String fullUser = user + "/token";
         // Providing authentication for the API request
 
+        System.out.println("the user is " + fullUser);
+        System.out.println("the token is " + token);
+        System.out.println("the subdomain is " + subdomain);
         Authenticator.setDefault (new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("asrivathsa@scu.edu/token",token.toCharArray());
+                return new PasswordAuthentication(fullUser,token.toCharArray());
             }
         });
         JSONObject obj = null;
@@ -151,7 +161,7 @@ public class Main {
 
             // GET request to get a ticket from Zendesk
 
-            URL url = new URL("https://zccabhilash.zendesk.com/api/v2/tickets/"+ ticketNumber + ".json?");
+            URL url = new URL("https://"+subdomain+".zendesk.com/api/v2/tickets/"+ ticketNumber + ".json?");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
@@ -199,21 +209,23 @@ public class Main {
     }
 
     // Method to retrieve all tickets from Zendesk using the API
-    public static JSONArray retrieveAllData(String token){
+    public static JSONArray retrieveAllData(String subdomain, String user, String token){
+
         JSONArray arr = null;
+        String fulluser = user + "/token";
 
         // Providing authentication for the API request
 
         Authenticator.setDefault (new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("asrivathsa@scu.edu/token",token.toCharArray());
+                return new PasswordAuthentication(fulluser,token.toCharArray());
             }
         });
 
         try {
             // GET request to get all tickets from Zendesk
 
-            URL url = new URL("https://zccabhilash.zendesk.com/api/v2/tickets.json?");
+            URL url = new URL("https://" + subdomain + ".zendesk.com/api/v2/tickets.json?");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");

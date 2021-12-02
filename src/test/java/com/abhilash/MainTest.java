@@ -1,5 +1,6 @@
 package com.abhilash;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.DisplayName;
@@ -9,12 +10,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
 
-    String token = "C2wruqvtdnC4gBd2evT70RbNtC4aQ7F8qUdLwj1S";
 
     @Test
     @DisplayName("Testing retrieving a specific ticket with correct credentials")
     void retrieveTicket() {
-        JSONObject obj = Main.retrieveTicket(1, token);
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = dotenv.get("USERNAME");
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = dotenv.get("TOKEN");
+        JSONObject obj = Main.retrieveTicket(1, subDomain, user, token);
         assertNotNull(obj);
 
     }
@@ -22,8 +27,13 @@ class MainTest {
     @Test
     @DisplayName("Testing retrieving a specific ticket with incorrect credentials")
     void retrieveTicketWrongCred() {
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = "wrongUser";
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = "wrongToken";
         try {
-            JSONObject obj = Main.retrieveTicket(1, "wrong Credentials");
+            JSONObject obj = Main.retrieveTicket(1, subDomain, user, token);
         }catch (RuntimeException e) {
             //if execution reaches here, it indicates this exception has occurred.
             assertTrue(true);
@@ -33,14 +43,24 @@ class MainTest {
     @Test
     @DisplayName("All tickets should be retrieved with correct credentials")
     void retrieveAllData() {
-        JSONArray array = Main.retrieveAllData(token);
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = dotenv.get("USERNAME");
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = dotenv.get("TOKEN");
+        JSONArray array = Main.retrieveAllData(subDomain, user, token);
         assertNotNull(array);
     }
     @Test
     @DisplayName("Tickets should not be retrieved with incorrect credentials")
     void retrieveAllDataWrongCred() {
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = "wrongUser";
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = "wrongToken";
         try {
-            JSONArray array = Main.retrieveAllData("wrong Credentials");
+            JSONArray array = Main.retrieveAllData(subDomain, user, token);
         }catch (RuntimeException e) {
             //if execution reaches here, it indicates this exception has occurred.
             assertTrue(true);
@@ -50,14 +70,24 @@ class MainTest {
     @Test
     @DisplayName("When an invalid ticket id is provided, it should return a null object ")
     void retrieveTicketInvalidId() {
-        JSONObject obj = Main.retrieveTicket(-1, token);
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = dotenv.get("USERNAME");
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = dotenv.get("TOKEN");
+        JSONObject obj = Main.retrieveTicket(-1, subDomain, user, token);
         assertNull(obj);
     }
 
     @Test
     @DisplayName("When a ticket number which does not exist is provided, it should return a null object ")
     void retrieveTicketUnavailableId() {
-        JSONObject obj = Main.retrieveTicket(900000, token);
+        Dotenv dotenv = null;
+        dotenv = Dotenv.configure().load();
+        String user = dotenv.get("USERNAME");
+        String subDomain = dotenv.get("SUBDOMAIN");
+        String token = dotenv.get("TOKEN");
+        JSONObject obj = Main.retrieveTicket(900000,subDomain, user, token);
         assertNull(obj);
     }
 }
