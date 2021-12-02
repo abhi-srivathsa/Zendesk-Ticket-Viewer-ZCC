@@ -3,6 +3,7 @@
 ## Table of contents
 * [Introduction](#introduction)
 * [Technologies](#technologies)
+* [Requirements](#requirements)
 * [Installation](#installation)
 * [Usage](#Usage)
 
