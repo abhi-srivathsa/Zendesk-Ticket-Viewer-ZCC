@@ -31,7 +31,12 @@ Change the current working directory
 ```
 cd Zendesk-Ticket-Viewer-ZCC
 ```
-
+Replace credential placeholders with your credentials in .env file
+```
+SUBDOMAIN=<subdomain>
+USERNAME=<username>
+TOKEN=<token>
+```
 Run the following command in the working directory (directory with pom.xml) of the project to compile, test and package the project
 ```
 mvn clean package
