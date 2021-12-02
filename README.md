@@ -31,6 +31,8 @@ Change the current working directory
 ```
 cd Zendesk-Ticket-Viewer-ZCC
 ```
+Generate an API token from your Zendesk Account
+
 Replace credential placeholders with your credentials in .env file
 ```
 SUBDOMAIN=<subdomain>
