@@ -33,7 +33,7 @@ cd Zendesk-Ticket-Viewer-ZCC
 ```
 Generate an API token from your Zendesk Account or use a previous active token
 
-Replace credential placeholders with your credentials in .env file
+Replace credential placeholders with your credentials in .env file (if using a linux / MacOS terminal, use ls -a to list all files including . files)
 ```
 SUBDOMAIN=<subdomain>
 USERNAME=<username>
