@@ -39,7 +39,7 @@ SUBDOMAIN=<subdomain>
 USERNAME=<username>
 TOKEN=<token>
 ```
-Run the following command (in the current working directory with pom.xml) of the project to compile, test and package the project
+Run the following command (in the current working directory with pom.xml) to compile, test and package the project
 ```
 mvn clean package
 ```
