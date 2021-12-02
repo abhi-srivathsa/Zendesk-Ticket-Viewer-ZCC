@@ -31,7 +31,7 @@ Change the current working directory
 ```
 cd Zendesk-Ticket-Viewer-ZCC
 ```
-Generate an API token from your Zendesk Account
+Generate an API token from your Zendesk Account or use a previous active token
 
 Replace credential placeholders with your credentials in .env file
 ```
