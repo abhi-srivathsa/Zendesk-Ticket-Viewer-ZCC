@@ -150,9 +150,7 @@ public class Main {
         String fullUser = user + "/token";
         // Providing authentication for the API request
 
-        System.out.println("the user is " + fullUser);
-        System.out.println("the token is " + token);
-        System.out.println("the subdomain is " + subdomain);
+
         Authenticator.setDefault (new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(fullUser,token.toCharArray());
