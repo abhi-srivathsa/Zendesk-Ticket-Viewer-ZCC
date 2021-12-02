@@ -80,11 +80,12 @@ public class Main {
 
     //method to print all tickets
     public static void printAllTickets(String subdomain, String user, String token){
-        // An array of JSON objects are returned
-        // Each ticket is listed with minimal information
-        // Displays 25 tickets for each page
+
 
         JSONArray arr = retrieveAllData(subdomain, user, token);
+        // An array of JSON objects are retrieved
+        // Each ticket is listed with minimal information
+        // Displays 25 tickets for each page
         if(arr == null) return;
         int ticketCount = 0;
         Boolean isNext = true;
@@ -126,9 +127,10 @@ public class Main {
     // Method to display detailed information for a specific ticket
 
     public static void printSpecificTicket(int ticketNumber, String subdomain, String user, String token){
-        // A JSON object is returned and the required values are displayed
 
         JSONObject obj = retrieveTicket(ticketNumber,subdomain, user, token);
+        // A JSON object is retrieved and the required values are displayed
+
         if(obj == null) return;
         System.out.println("\nTICKET DETAILS");
         System.out.println("Ticket id : " + obj.get("id"));
